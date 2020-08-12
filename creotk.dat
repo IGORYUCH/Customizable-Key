@@ -5,36 +5,6 @@ java_app_class		ru.ruselprom.KeyMain
 java_app_start		start
 java_app_stop		stop
 allow_stop			true
-delay_start			true
+delay_start			false
 text_dir			C:/Users/beasty/Desktop/creo_apps/text
-end
-name				java_demo
-startup				otk_java
-java_app_classpath	C:/Users/beasty/Desktop/creo_apps/testCreo.jar
-java_app_class		testCreo.CreoTest
-java_app_start		start
-java_app_stop		stop
-allow_stop			true
-delay_start			true
-text_dir			C:/Users/beasty/Desktop/creo_apps/text
-end
-name     			OtkJavaExamples
-startup  			otk_java
-java_app_classpath 	C:/Users/beasty/Desktop/creo_apps/otkjavaexamples.jar
-java_app_class  	com.ptc.otkjavaexamples.otkExamplesMain
-java_app_start  	start
-java_app_stop   	stop
-allow_stop      	true
-delay_start     	true
-text_dir   			C:/Users/beasty/Desktop/creo_apps/text
-end
-name				Stator
-startup				otk_java
-java_app_classpath 	C:/Users/beasty/Desktop/creo_apps/Stator.jar
-java_app_class  	ru.ButtonStator
-java_app_start  	start
-java_app_stop   	stop
-allow_stop      	true
-delay_start     	true
-text_dir        	C:/Users/beasty/Desktop/creo_apps/text
 end
