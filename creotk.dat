@@ -1,7 +1,7 @@
 name				java_customizable_key
 startup				otk_java
 java_app_classpath	C:/Users/beasty/Desktop/creo_apps/CustomizableKey.jar
-java_app_class		ru.ruselprom.KeyMain
+java_app_class		ru.ruselprom.ButtonMain
 java_app_start		start
 java_app_stop		stop
 allow_stop			true
