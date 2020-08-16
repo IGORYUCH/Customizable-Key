@@ -59,6 +59,7 @@ public class UIOKButtonListener extends DefaultPushButtonListener {
 		Solid solidModel = (Solid)model;
 		Window window = session.CreateModelWindow(model); 
 		adjustModelToParams(DialogMain.selectedLengthValue,DialogMain. selectedWidthValue, DialogMain.selectedHeightValue, solidModel);
+		ru.ruselprom.fet.operations.FetOperations.suppressFeature(solidModel, "CHAMF");
 		model.Display();
 		window.Activate();
 		
