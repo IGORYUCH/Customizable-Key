@@ -3,6 +3,7 @@ package ru.ruselprom.listeners;
 import com.ptc.cipjava.jxthrowable;
 import com.ptc.pfc.pfcModel.Model;
 import com.ptc.pfc.pfcModel.ModelDescriptor;
+import com.ptc.pfc.pfcModel.Models;
 import com.ptc.pfc.pfcSession.CreoCompatibility;
 import com.ptc.pfc.pfcSession.RetrieveModelOptions;
 import com.ptc.pfc.pfcSession.Session;
@@ -19,6 +20,7 @@ import com.ptc.wfc.wfcSession.WSession;
 
 import ru.ruselprom.DialogMain;
 import ru.ruselprom.parameters.Parameters;
+import ru.ruselprom.fet.operations.*;
 
 public class UIOKButtonListener extends DefaultPushButtonListener {
 
@@ -27,6 +29,9 @@ public class UIOKButtonListener extends DefaultPushButtonListener {
 		String implementation = "";
 		String newModelName = "";
 		String pathToTemplates = "";
+		
+		//ru.ruselprom.templates.TemplateModel t = new ru.ruselprom.templates.TemplateModel("tmp.drw", "path//");
+		
 		Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
 		WSession wsession  = (WSession)session;
 		pathToTemplates = wsession.GetApplicationTextPath();
@@ -38,18 +43,27 @@ public class UIOKButtonListener extends DefaultPushButtonListener {
 		} else if (uifcCheckButton.CheckButtonFind(DialogMain.OTK_DIALOG, "CheckButton6").GetCheckedState().equals(CheckState.CHECK_STATE_SET)) {
 			implementation = "template3";
 		} else {
-			session.UIShowMessageDialog("�� ������� ����������!", null);
+			session.UIShowMessageDialog("Не выбрано исполнение!", null);
 			return;
 		}
 		
 		if (DialogMain.selectedLengthValue == 0 || DialogMain.selectedWidthValue == 0 || DialogMain.selectedHeightValue == 0) {
-			session.UIShowMessageDialog("��������� ������� �� ���� �������!", null);
+			session.UIShowMessageDialog("Некоторые размеры не были выбраны!", null);
 			return;
-		}
+		}               
 		
 		if (uifcInputPanel.InputPanelFind(DialogMain.OTK_DIALOG, "InputPanel1").GetTextValue().equals("")) {
 			uifcInputPanel.InputPanelFind(DialogMain.OTK_DIALOG, "InputPanel1").SetTextValue(DialogMain.dtf.format(DialogMain.now));
 			return;
+		}
+		
+		Models models = session.ListModels();
+		session.UIShowMessageDialog("Size: " + Integer.toString(models.getarraysize()), null);
+		for (int i = 0; i < models.getarraysize(); i++) {
+			if (models.get(i).GetFullName().equals(newModelName)) {
+				session.UIShowMessageDialog("Модель с таким именем уже существует в текущей сессии!", null);
+				return;
+			}
 		}
 		
 		ModelDescriptor descriptor = com.ptc.pfc.pfcModel.pfcModel.ModelDescriptor_CreateFromFileName(pathToTemplates + "text\\" + implementation + ".prt");
@@ -58,10 +72,12 @@ public class UIOKButtonListener extends DefaultPushButtonListener {
 		Model model = template.CopyAndRetrieve(newModelName, null);
 		Solid solidModel = (Solid)model;
 		Window window = session.CreateModelWindow(model); 
-		adjustModelToParams(DialogMain.selectedLengthValue,DialogMain. selectedWidthValue, DialogMain.selectedHeightValue, solidModel);
-		ru.ruselprom.fet.operations.FetOperations.suppressFeature(solidModel, "CHAMF");
+		adjustModelToParams(DialogMain.selectedLengthValue, DialogMain.selectedWidthValue, DialogMain.selectedHeightValue, solidModel);
+		Parameters.setStringParamValue("НАИМЕНОВАНИЕ_1", "Шпонка призматическая", solidModel);
+		FetOperations.suppressFeature(solidModel, "CHAMF");
 		model.Display();
 		window.Activate();
+		//ru.ruselprom.base.OrientViews.СЛЕВА;
 		
 		uifcComponent.ExitDialog(handle.GetDialog(), 0);
  	}
