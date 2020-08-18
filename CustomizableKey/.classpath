@@ -34,5 +34,6 @@
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/otk_classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ruselprom_classes"/>
+	<classpathentry kind="lib" path="C:/Users/beasty/Downloads/sqljdbc_8.2/rus/mssql-jdbc-8.2.2.jre11.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>

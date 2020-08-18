@@ -1,5 +1,7 @@
 package ru.ruselprom.listeners.optionMenu;
 
+import java.util.TreeSet;
+
 import com.ptc.cipjava.jxthrowable;
 import com.ptc.cipjava.stringseq;
 import com.ptc.uifc.uifcOptionMenu.DefaultOptionMenuListener;
@@ -12,19 +14,19 @@ public class OptionMenu1OptionMenuListener extends DefaultOptionMenuListener { /
 	
 	@Override
 	public void OnItemSelect(OptionMenu handle) throws jxthrowable {
-		if (handle.GetSelectedItemNameArray().get(0).equals("0")) { //Если выбрано (not selecte) сбрасываем все размеры
+		if (handle.GetSelectedItemNameArray().get(0).equals("0")) { //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (not selecte) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			DialogMain.reset();
 		} else {
 			stringseq selectedItem = handle.GetSelectedItemNameArray();
 			DialogMain.selectedLengthValue = Integer.parseInt(selectedItem.get(0));
-			Integer[] valueArray = {DialogMain.selectedLengthValue};
-			DialogMain.fillOptionMenuByIndex(1, valueArray);
+			TreeSet<Integer> valueSet = new TreeSet<>();
+			valueSet.add(DialogMain.selectedLengthValue);
+			DialogMain.fillOptionMenuByIndex(1, valueSet);
 			handle.SetSelectedItemNameArray(selectedItem);
 			OptionMenu optionMenu2 = uifcOptionMenu.OptionMenuFind(DialogMain.OTK_DIALOG, "OptionMenu2");
 			OptionMenu optionMenu3 = uifcOptionMenu.OptionMenuFind(DialogMain.OTK_DIALOG, "OptionMenu3");
-			if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0") && optionMenu3.GetSelectedItemNameArray().get(0).equals("0")) { // Если параметры width и height еще не выбраны
-				for (int i = 0; i < DialogMain.GOSTtable.length; i++) {
-					Integer[] tableRow = DialogMain.GOSTtable[i];
+			if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0") && optionMenu3.GetSelectedItemNameArray().get(0).equals("0")) { // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ width пїЅ height пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+				for (Integer[] tableRow : DialogMain.GOSTtable) {
 					Integer minimumLength = tableRow[2];
 					Integer maximumLength = tableRow[3];
 					if (DialogMain.selectedLengthValue >= minimumLength && DialogMain.selectedLengthValue <= maximumLength) {
@@ -32,14 +34,12 @@ public class OptionMenu1OptionMenuListener extends DefaultOptionMenuListener { /
 						DialogMain.admissibleWidths.add(tableRow[0]);
 					}
 				}
-				Integer[] admissibleHeightsArray = DialogMain.admissibleHeights.toArray(new Integer[DialogMain.admissibleHeights.size()]);
-				Integer[] admissibleWidthsArray = DialogMain.admissibleWidths.toArray(new Integer[DialogMain.admissibleWidths.size()]);
-				DialogMain.fillOptionMenuByIndex(3, admissibleHeightsArray);
-				DialogMain.fillOptionMenuByIndex(2, admissibleWidthsArray);
+				DialogMain.fillOptionMenuByIndex(3, DialogMain.admissibleHeights);
+				DialogMain.fillOptionMenuByIndex(2, DialogMain.admissibleWidths);
 			} else {
-				if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0")) { // Если уже был выбран параметр height и параметр length
+				if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0")) { // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ height пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ length
 					DialogMain.filterWidthAdmissibleValues();
-				} else if (optionMenu3.GetSelectedItemNameArray().get(0).equals("0") ) {// Если уже был выбран параметр width и параметр length
+				} else if (optionMenu3.GetSelectedItemNameArray().get(0).equals("0") ) {// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ width пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ length
 					DialogMain.filterHeightAdmissibleValues();
 				}
 			}

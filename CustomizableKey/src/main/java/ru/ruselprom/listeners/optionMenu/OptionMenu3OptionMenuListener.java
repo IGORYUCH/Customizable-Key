@@ -1,5 +1,7 @@
 package ru.ruselprom.listeners.optionMenu;
 
+import java.util.TreeSet;
+
 import com.ptc.cipjava.jxthrowable;
 import com.ptc.cipjava.stringseq;
 import com.ptc.uifc.uifcOptionMenu.DefaultOptionMenuListener;
@@ -18,25 +20,21 @@ public class OptionMenu3OptionMenuListener extends DefaultOptionMenuListener { /
 		} else {
 			stringseq selectedItem = handle.GetSelectedItemNameArray();
 			DialogMain.selectedHeightValue = Integer.parseInt(selectedItem.get(0));
-			Integer[] valueArray = {DialogMain.selectedHeightValue};
-			DialogMain.fillOptionMenuByIndex(3, valueArray);
+			TreeSet<Integer> valueSet = new TreeSet<>();
+			valueSet.add(DialogMain.selectedHeightValue);
+			DialogMain.fillOptionMenuByIndex(3, valueSet);
 			handle.SetSelectedItemNameArray(selectedItem);
 			OptionMenu optionMenu1 = uifcOptionMenu.OptionMenuFind(DialogMain.OTK_DIALOG, "OptionMenu1");
 			OptionMenu optionMenu2 = uifcOptionMenu.OptionMenuFind(DialogMain.OTK_DIALOG, "OptionMenu2");
-			
-			
 			if (optionMenu1.GetSelectedItemNameArray().get(0).equals("0") && optionMenu2.GetSelectedItemNameArray().get(0).equals("0")) {
-				for (int i = 0; i < DialogMain.GOSTtable.length; i++) {
-					Integer[] tableRow = DialogMain.GOSTtable[i];
+				for (Integer[] tableRow : DialogMain.GOSTtable) {
 					if (DialogMain.selectedHeightValue == tableRow[1]) {
 						DialogMain.admissibleWidths.add(tableRow[0]);
 						DialogMain.fillAdmisisbleLengths(tableRow);
 					}
 				}
-				Integer[] admissibleWidthsArray = DialogMain.admissibleWidths.toArray(new Integer[DialogMain.admissibleWidths.size()]);
-				Integer[] admissibleLengthsArray = DialogMain.admissibleLengths.toArray(new Integer[DialogMain.admissibleLengths.size()]);
-				DialogMain.fillOptionMenuByIndex(2, admissibleWidthsArray);
-				DialogMain.fillOptionMenuByIndex(1, admissibleLengthsArray);
+				DialogMain.fillOptionMenuByIndex(2, DialogMain.admissibleWidths);
+				DialogMain.fillOptionMenuByIndex(1, DialogMain.admissibleLengths);
 			} else {
 				if (optionMenu1.GetSelectedItemNameArray().get(0).equals("0")) {
 					DialogMain.filterLengthAdmissibleValues();

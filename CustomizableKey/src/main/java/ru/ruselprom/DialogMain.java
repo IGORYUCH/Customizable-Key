@@ -1,11 +1,22 @@
 package ru.ruselprom;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 import java.util.TreeSet;
 import com.ptc.cipjava.jxthrowable;
 import com.ptc.cipjava.stringseq;
 import com.ptc.pfc.pfcCommand.DefaultUICommandActionListener;
+import com.ptc.pfc.pfcSession.CreoCompatibility;
+import com.ptc.pfc.pfcSession.Session;
+import com.ptc.pfc.pfcSession.pfcSession;
 import com.ptc.uifc.uifcCheckButton.uifcCheckButton;
 import com.ptc.uifc.uifcComponent.uifcComponent;
 import com.ptc.uifc.uifcCore.ItemPositionData;
@@ -14,6 +25,7 @@ import com.ptc.uifc.uifcOptionMenu.OptionMenu;
 import com.ptc.uifc.uifcOptionMenu.OptionMenuItem;
 import com.ptc.uifc.uifcOptionMenu.uifcOptionMenu;
 import com.ptc.uifc.uifcPushButton.uifcPushButton;
+import com.ptc.wfc.wfcSession.WSession;
 
 import ru.ruselprom.listeners.*;
 import ru.ruselprom.listeners.optionMenu.*;
@@ -25,45 +37,30 @@ public class DialogMain extends DefaultUICommandActionListener {
 	public static TreeSet<Integer> admissibleHeights = new TreeSet<>();
 	public static TreeSet<Integer> admissibleWidths = new TreeSet<>();
 	public static TreeSet<Integer> admissibleLengths = new TreeSet<>();
-		
+	public static String connectionUrl;
 	public static int selectedLengthValue = 0;
 	public static int selectedWidthValue = 0;
 	public static int selectedHeightValue = 0;
-	public static final Integer[] lengths = {6,8,10,12,14,16,18,20,22,25,28,32,36,40,45,50,56,63,70,80,90,100,110,125,140,160,180,200,220,250,280,320,360,400,450,500};
-	public static final Integer[] widths = {2,3,4,5,6,7,8,10,12,14,16,18,20,22,24,25,28,32,36,40,45,50,56,63,70,80,90,100};
-	public static final Integer[] heights = {2,3,4,5,6,7,8,9,10,11,12,14,16,18,20,22,25,28,32,36,40,45,50};
-	public static final Integer[][] GOSTtable =	{
-											{2,2,6,20}, // 0 - width 1 - height 2 - length min 3 - length max
-											{3,3,6,36},
-											{4,4,8,45},
-											{5,5,10,56},
-											{6,6,14,70},
-											{7,7,16,63},
-											{8,7,18,90},
-											{10,8,22,110},
-											{12,8,28,140},
-											{14,9,36,160},
-											{16,10,45,180},
-											{18,11,50,200},
-											{20,12,56,220},
-											{22,14,63,250},
-											{24,14,63,250},
-											{25,14,70,280},
-											{28,16,80,320},
-											{32,18,90,360},
-											{36,20,100,400},
-											{40,22,100,400},
-											{45,25,110,450},
-											{50,28,125,500},
-											{56,32,140,500},
-											{63,32,150,500},
-											{70,36,180,500},
-											{80,40,200,500},
-											{90,45,220,500},
-											{100,50,250,500}
-											};
+	public static TreeSet<Integer> lengths = new TreeSet<>(); 
+	public static TreeSet<Integer> widths = new TreeSet<>(); 
+	public static TreeSet<Integer> heights = new TreeSet<>(); 
+	public static Integer[][] GOSTtable;
+	public static Properties properties;
+	public static String textFolder;
 	
-	public static void fillOptionMenuByIndex(Integer menuIndex, Integer[] dimensionsArray)  throws jxthrowable { // index begins from 1!
+	public static Properties loadProperties(String pathToProperties) throws jxthrowable {
+		Properties properties = null;
+		try {
+			FileInputStream fileInputStream = new FileInputStream(pathToProperties + "app.properties");
+			properties = new Properties();
+			properties.load(fileInputStream);
+		} catch (IOException e) {
+			ButtonMain.showException(e);
+		}
+		return properties;
+	}
+	
+	public static void fillOptionMenuByIndex(Integer menuIndex, TreeSet<Integer> dimensions)  throws jxthrowable { // index begins from 1!
 		OptionMenu optionMenu = uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu" + menuIndex.toString());
 		ItemPositionData data = com.ptc.uifc.uifcCore.uifcCore.ItemPositionData_Create();
 		stringseq sequence = optionMenu.GetItemNameArray();
@@ -76,20 +73,22 @@ public class DialogMain extends DefaultUICommandActionListener {
 		
 		sequence = optionMenu.GetItemNameArray();
 		int menuItemsLength = sequence.getarraysize();
-		for (int i = 0; i < dimensionsArray.length; i++) {
-			item = com.ptc.uifc.uifcOptionMenu.uifcOptionMenu.OptionMenuItemDefine(dimensionsArray[i].toString());
-			item.SetText(dimensionsArray[i].toString());
-			data.SetIndex(menuItemsLength + i + 1);
+		int menuItemIndex = 1;
+		for (Integer dimension: dimensions) {
+			item = com.ptc.uifc.uifcOptionMenu.uifcOptionMenu.OptionMenuItemDefine(dimension.toString());
+			item.SetText(dimension.toString());
+			data.SetIndex(menuItemsLength + menuItemIndex);
 			optionMenu.InsertItem(item, data);
+			menuItemIndex++;
 		}
 	}
-	
+
 	public static void fillAdmisisbleLengths(Integer[] tableRow) {
 		int maximumLength = tableRow[3];
 		int minimumLength = tableRow[2];
-		for (int j = 0; j < lengths.length; j++) {
-			if (lengths[j] >= minimumLength && lengths[j] <= maximumLength) {
-				admissibleLengths.add(lengths[j]);
+		for (Integer length: lengths) {
+			if (length >= minimumLength && length <= maximumLength) {
+				admissibleLengths.add(length);
 			}
 		}
 	}
@@ -108,45 +107,94 @@ public class DialogMain extends DefaultUICommandActionListener {
 	
 	public static void filterLengthAdmissibleValues() throws jxthrowable {
 		admissibleLengths.clear();
-		for (int i = 0; i < GOSTtable.length; i++) {
-			Integer[] tableRow = GOSTtable[i];
+		for (Integer[] tableRow : GOSTtable) {
 			if (selectedWidthValue == tableRow[0] && selectedHeightValue == tableRow[1]) {
 				fillAdmisisbleLengths(tableRow);
 			}
 		}
-		Integer[] admissibleLengthsArray = admissibleLengths.toArray(new Integer[admissibleLengths.size()]);
-		fillOptionMenuByIndex(1, admissibleLengthsArray);
+		fillOptionMenuByIndex(1, admissibleLengths);
 	}
 	
 	public static void filterWidthAdmissibleValues() throws jxthrowable {
 		admissibleWidths.clear();
-		for (int i = 0; i < GOSTtable.length;i++) {
-			Integer[] tableRow = GOSTtable[i];
+		for (Integer[] tableRow : GOSTtable) {
 			Integer maximumLength = tableRow[3];
 			Integer minimumLength = tableRow[2];
 			if (selectedHeightValue == tableRow[1] && (selectedLengthValue >= minimumLength && selectedLengthValue <= maximumLength)) {
 				admissibleWidths.add(tableRow[0]);
 			}
 		}
-		Integer[] admissibleWidthsArray = admissibleWidths.toArray(new Integer[admissibleWidths.size()]);
-		fillOptionMenuByIndex(2, admissibleWidthsArray);
+		fillOptionMenuByIndex(2, admissibleWidths);
 	}
 	
 	public static void filterHeightAdmissibleValues() throws jxthrowable {
 		admissibleHeights.clear();
-		for (int i = 0; i < GOSTtable.length;i++) {
-			Integer[] tableRow = GOSTtable[i];
+		for (Integer[] tableRow : GOSTtable) {
 			Integer minimumLength = tableRow[2];
 			Integer maximumLength = tableRow[3];
 			if ((selectedLengthValue >= minimumLength && selectedLengthValue <= maximumLength) && selectedWidthValue == tableRow[0]) {
 				admissibleHeights.add(tableRow[1]);
 			}
 		}
-		Integer[] admissibleHeightsArray = admissibleHeights.toArray(new Integer[admissibleHeights.size()]);
-		fillOptionMenuByIndex(3, admissibleHeightsArray);
+		fillOptionMenuByIndex(3, admissibleHeights);
 	}
 	
-	public void showDialog() throws jxthrowable{
+	public static void loadLengths() throws jxthrowable {
+		try {
+			ResultSet rs = executeQuery("SELECT * FROM dbo.lengths");
+			while (rs.next()) {
+				lengths.add(Integer.parseInt(rs.getString("length")));
+			}
+			
+		} catch (SQLException e) {
+			ButtonMain.showException(e);
+		}
+	}
+	
+	public static void getWidths() {
+		for (int i = 0; i < GOSTtable.length; i++) {
+			widths.add(GOSTtable[i][0]);
+		}
+	}
+	
+	public static void getHeights() {
+		for (int i = 0; i < GOSTtable.length; i++) {
+			heights.add(GOSTtable[i][1]);
+		}
+	}
+	
+	public static void loadGOSTtable() throws jxthrowable {
+		try {
+			ResultSet rs = executeQuery("SELECT COUNT(*) FROM dbo.GOSTTable");
+			int size = 0;
+			while (rs.next()) { 
+				size = rs.getInt(1);
+			}
+			rs = executeQuery("SELECT * FROM dbo.GOSTTable");
+			GOSTtable = new Integer[size][4];
+			int i = 0;
+			while (rs.next()) { 
+				GOSTtable[i][0] = Integer.parseInt(rs.getString("width"));
+				GOSTtable[i][1] = Integer.parseInt(rs.getString("height"));
+				GOSTtable[i][2] = Integer.parseInt(rs.getString("lengthMin"));
+				GOSTtable[i][3] = Integer.parseInt(rs.getString("lengthMax"));
+				i++;
+			}
+		} catch (SQLException e) {
+			ButtonMain.showException(e);
+		}
+	}
+	
+	public static ResultSet executeQuery(String SQL) throws SQLException {
+			Connection connection = DriverManager.getConnection(connectionUrl);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery(SQL);
+			return result;
+	}
+	
+	
+	
+	public static void showDialog() throws jxthrowable{
 		try {
 			uifcComponent.CreateDialog(OTK_DIALOG, "KeyDialog");
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "CommitCancel").AddActionListener(new UICloseListener());
@@ -158,6 +206,16 @@ public class DialogMain extends DefaultUICommandActionListener {
 			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu2").AddActionListener(new OptionMenu2OptionMenuListener());
 			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu3").AddActionListener(new OptionMenu3OptionMenuListener());	
 			uifcInputPanel.InputPanelFind(DialogMain.OTK_DIALOG, "InputPanel1").SetTextValue(dtf.format(now));
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
+			WSession wSession = (WSession)session;
+			textFolder = wSession.GetApplicationTextPath() + "text\\";
+			properties = loadProperties(textFolder);
+			connectionUrl = properties.getProperty("db_conn_str");
+			loadGOSTtable();
+			loadLengths();
+			getWidths();
+			getHeights();
 			fillOptionMenuByIndex(1, lengths);
 			fillOptionMenuByIndex(2, widths);
 			fillOptionMenuByIndex(3, heights);
@@ -169,5 +227,4 @@ public class DialogMain extends DefaultUICommandActionListener {
 			uifcComponent.DestroyDialog(OTK_DIALOG);
 		}
 	}
-	
 }
