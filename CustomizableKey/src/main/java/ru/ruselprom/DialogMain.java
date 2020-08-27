@@ -230,7 +230,7 @@ public class DialogMain extends DefaultUICommandActionListener {
 	
 	public static void showDialog() throws jxthrowable{
 		try {
-			uifcComponent.CreateDialog(OTK_DIALOG, "KeyDialog2");
+			uifcComponent.CreateDialog(OTK_DIALOG, "KeyDialog");
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "CommitCancel").AddActionListener(new UICloseListener());
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "PushButton1").AddActionListener(new PushButton1Listener());
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "CommitOK").AddActionListener(new UIOKButtonListener());
