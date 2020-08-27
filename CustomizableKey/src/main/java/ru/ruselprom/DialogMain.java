@@ -41,12 +41,15 @@ public class DialogMain extends DefaultUICommandActionListener {
 	public static int selectedLengthValue = 0;
 	public static int selectedWidthValue = 0;
 	public static int selectedHeightValue = 0;
+	public static double chamferValue = 0;
 	public static TreeSet<Integer> lengths = new TreeSet<>(); 
 	public static TreeSet<Integer> widths = new TreeSet<>(); 
 	public static TreeSet<Integer> heights = new TreeSet<>(); 
 	public static Integer[][] GOSTtable;
+	public static Double[] chamfers;
 	public static Properties properties;
 	public static String textFolder;
+	public static String copiesFolder;
 	
 	public static Properties loadProperties(String pathToProperties) throws jxthrowable {
 		Properties properties = null;
@@ -151,6 +154,20 @@ public class DialogMain extends DefaultUICommandActionListener {
 		}
 	}
 	
+	public static void loadChamfers() throws jxthrowable {
+		chamfers = new Double[GOSTtable.length];
+		try {
+			ResultSet rs = executeQuery("SELECT chamfer FROM dbo.GOSTtable");
+			for (int i = 0; rs.next(); i++) {
+				chamfers[i] = Double.parseDouble(rs.getString("chamfer"));
+			}
+			
+		} catch (SQLException e) {
+			ButtonMain.showException(e);
+		}
+	}
+	
+	
 	public static void getWidths() {
 		for (int i = 0; i < GOSTtable.length; i++) {
 			widths.add(GOSTtable[i][0]);
@@ -179,6 +196,8 @@ public class DialogMain extends DefaultUICommandActionListener {
 				GOSTtable[i][2] = Integer.parseInt(rs.getString("lengthMin"));
 				GOSTtable[i][3] = Integer.parseInt(rs.getString("lengthMax"));
 				i++;
+				
+				
 			}
 		} catch (SQLException e) {
 			ButtonMain.showException(e);
@@ -192,12 +211,28 @@ public class DialogMain extends DefaultUICommandActionListener {
 			return result;
 	}
 	
+	public static void setChamferValue() throws jxthrowable {
+		Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
+
+		for (int i = 0; i < GOSTtable.length; i++) {
+			Integer[] tableRow = GOSTtable[i];
+			Integer maximumLength = tableRow[3];
+			Integer minimumLength = tableRow[2];
+			if (selectedWidthValue == tableRow[0] && selectedHeightValue == tableRow[1] && (minimumLength <= selectedLengthValue && maximumLength >= selectedLengthValue)) {
+				chamferValue = chamfers[i];
+				break;
+			}
+		}	
+		session.UIShowMessageDialog("Chamfer selected: " +Double.toString(chamferValue), null);
+	}
+	
 	
 	
 	public static void showDialog() throws jxthrowable{
 		try {
-			uifcComponent.CreateDialog(OTK_DIALOG, "KeyDialog");
+			uifcComponent.CreateDialog(OTK_DIALOG, "KeyDialog2");
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "CommitCancel").AddActionListener(new UICloseListener());
+			uifcPushButton.PushButtonFind(OTK_DIALOG, "PushButton1").AddActionListener(new PushButton1Listener());
 			uifcPushButton.PushButtonFind(OTK_DIALOG, "CommitOK").AddActionListener(new UIOKButtonListener());
 			uifcCheckButton.CheckButtonFind(OTK_DIALOG, "CheckButton4").AddActionListener(new CheckButtonListener("CheckButton5", "CheckButton6"));
 			uifcCheckButton.CheckButtonFind(OTK_DIALOG, "CheckButton5").AddActionListener(new CheckButtonListener("CheckButton4", "CheckButton6"));
@@ -210,10 +245,13 @@ public class DialogMain extends DefaultUICommandActionListener {
 			Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
 			WSession wSession = (WSession)session;
 			textFolder = wSession.GetApplicationTextPath() + "text\\";
+			copiesFolder = textFolder;
+			uifcInputPanel.InputPanelFind(DialogMain.OTK_DIALOG, "InputPanel2").SetTextValue(copiesFolder);
 			properties = loadProperties(textFolder);
 			connectionUrl = properties.getProperty("db_conn_str");
 			loadGOSTtable();
 			loadLengths();
+			loadChamfers();
 			getWidths();
 			getHeights();
 			fillOptionMenuByIndex(1, lengths);

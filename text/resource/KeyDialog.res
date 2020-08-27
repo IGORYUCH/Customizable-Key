@@ -1,4 +1,4 @@
-﻿(Dialog KeyDialog
+﻿(Dialog KeyDialog2
     (Components
         (SubLayout Content)
         (Separator CommitSeparator)
@@ -65,6 +65,10 @@
         (Separator Separator1)
         (Label Label1)
         (InputPanel InputPanel1)
+        (Separator Separator2)
+        (Label Label3)
+        (InputPanel InputPanel2)
+        (PushButton PushButton1)
     )
     (Resources
         (Label2.Label "Выберите размеры:")
@@ -172,11 +176,29 @@
         (Label1.RightOffset 0)
         (InputPanel1.Columns 8)
         (InputPanel1.TopOffset 1)
-        (InputPanel1.BottomOffset 0)
+        (InputPanel1.BottomOffset 8)
         (InputPanel1.LeftOffset 0)
         (InputPanel1.RightOffset 0)
         (InputPanel1.InputType 0)
         (InputPanel1.CompleteMatch True)
+        (Separator2.TopOffset 8)
+        (Separator2.BottomOffset 8)
+        (Label3.Label "Сохранить в папку:")
+        (Label3.AttachLeft True)
+        (Label3.TopOffset 8)
+        (Label3.BottomOffset 0)
+        (Label3.LeftOffset 0)
+        (Label3.RightOffset 4)
+        (InputPanel2.TopOffset 8)
+        (InputPanel2.BottomOffset 0)
+        (InputPanel2.LeftOffset 3)
+        (InputPanel2.RightOffset 4)
+        (PushButton1.Label "Выбрать")
+        (PushButton1.AttachLeft True)
+        (PushButton1.TopOffset 8)
+        (PushButton1.BottomOffset 0)
+        (PushButton1.LeftOffset 3)
+        (PushButton1.RightOffset 0)
         (.AttachLeft True)
         (.AttachRight True)
         (.AttachTop True)
@@ -188,7 +210,7 @@
         (.AttachBottom True)
         (.Layout
             (Grid
-                (Rows 0 0 0 0 0 0 0 0)
+                (Rows 0 0 0 0 0 0 0 0 0 0)
                 (Cols 0 1 0 1 0 1)
                 (Size 1 6)
                 Label2 Label10 OptionMenu1 Label11 OptionMenu2 Label12 OptionMenu3
@@ -202,6 +224,10 @@
                 Label1
                 (Size 1 6)
                 InputPanel1
+                (Size 1 6)
+                Separator2 Label3
+                (Size 1 4)
+                InputPanel2 PushButton1
             )
         )
     )

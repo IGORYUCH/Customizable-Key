@@ -17,6 +17,12 @@ public class ButtonMain {
 	public static void start() throws jxthrowable{ 
 		try {
 		Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
+		
+		
+		KeyActionListener l = new KeyActionListener();
+		l.OnCommand();
+		
+		
 		UICommand uiCommand = session.UICreateCommand("Key", new KeyActionListener());
 		uiCommand.SetIcon("key_icon16x16.png");
 		uiCommand.Designate(MSG_FILE, "Key.label", "Help.text", null);

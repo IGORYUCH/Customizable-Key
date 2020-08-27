@@ -40,6 +40,8 @@ public class OptionMenu3OptionMenuListener extends DefaultOptionMenuListener { /
 					DialogMain.filterLengthAdmissibleValues();
 				} else if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0")) {
 					DialogMain.filterWidthAdmissibleValues();
+				} else {
+					DialogMain.setChamferValue();
 				}
 			}
 		}

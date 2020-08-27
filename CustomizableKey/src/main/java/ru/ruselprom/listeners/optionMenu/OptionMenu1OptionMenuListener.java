@@ -36,11 +36,14 @@ public class OptionMenu1OptionMenuListener extends DefaultOptionMenuListener { /
 				}
 				DialogMain.fillOptionMenuByIndex(3, DialogMain.admissibleHeights);
 				DialogMain.fillOptionMenuByIndex(2, DialogMain.admissibleWidths);
+				
 			} else {
 				if (optionMenu2.GetSelectedItemNameArray().get(0).equals("0")) { // ���� ��� ��� ������ �������� height � �������� length
 					DialogMain.filterWidthAdmissibleValues();
 				} else if (optionMenu3.GetSelectedItemNameArray().get(0).equals("0") ) {// ���� ��� ��� ������ �������� width � �������� length
 					DialogMain.filterHeightAdmissibleValues();
+				} else {
+					DialogMain.setChamferValue();
 				}
 			}
 		}
