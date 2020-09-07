@@ -85,29 +85,6 @@ public class DialogMain extends DefaultUICommandActionListener {
 			menuItemIndex++;
 		}
 	}
-	
-	public static void fillOptionMenuByIndex2(Integer menuIndex, TreeSet<String> values)  throws jxthrowable { // index begins from 1!
-		OptionMenu optionMenu = uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu" + menuIndex.toString());
-		ItemPositionData data = com.ptc.uifc.uifcCore.uifcCore.ItemPositionData_Create();
-		stringseq sequence = optionMenu.GetItemNameArray();
-		optionMenu.DeleteItemsByName(sequence);
-		
-		OptionMenuItem item = com.ptc.uifc.uifcOptionMenu.uifcOptionMenu.OptionMenuItemDefine("0");
-		item.SetText("(not selected)");
-		data.SetIndex(0);
-		optionMenu.InsertItem(item, data);
-		
-		sequence = optionMenu.GetItemNameArray();
-		int menuItemsLength = sequence.getarraysize();
-		int menuItemIndex = 1;
-		for (String value: values) {
-			item = com.ptc.uifc.uifcOptionMenu.uifcOptionMenu.OptionMenuItemDefine(Integer.toString(menuItemIndex));
-			item.SetText(value);
-			data.SetIndex(menuItemsLength + menuItemIndex);
-			optionMenu.InsertItem(item, data);
-			menuItemIndex++;
-		}
-	}
 
 	public static void fillAdmisisbleLengths(Integer[] tableRow) {
 		int maximumLength = tableRow[3];
@@ -212,11 +189,15 @@ public class DialogMain extends DefaultUICommandActionListener {
 			}
 			rs = executeQuery("SELECT * FROM dbo.GOSTTable");
 			GOSTtable = new Integer[size][4];
-			for (int i = 0; rs.next(); i++) { 
+			int i = 0;
+			while (rs.next()) { 
 				GOSTtable[i][0] = Integer.parseInt(rs.getString("width"));
 				GOSTtable[i][1] = Integer.parseInt(rs.getString("height"));
 				GOSTtable[i][2] = Integer.parseInt(rs.getString("lengthMin"));
 				GOSTtable[i][3] = Integer.parseInt(rs.getString("lengthMax"));
+				i++;
+				
+				
 			}
 		} catch (SQLException e) {
 			ButtonMain.showException(e);
@@ -242,6 +223,7 @@ public class DialogMain extends DefaultUICommandActionListener {
 				break;
 			}
 		}	
+		session.UIShowMessageDialog("Chamfer selected: " +Double.toString(chamferValue), null);
 	}
 	
 	
@@ -257,10 +239,7 @@ public class DialogMain extends DefaultUICommandActionListener {
 			uifcCheckButton.CheckButtonFind(OTK_DIALOG, "CheckButton6").AddActionListener(new CheckButtonListener("CheckButton4", "CheckButton5"));
 			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu1").AddActionListener(new OptionMenu1OptionMenuListener());
 			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu2").AddActionListener(new OptionMenu2OptionMenuListener());
-			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu3").AddActionListener(new OptionMenu3OptionMenuListener());
-			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu4").AddActionListener(new OptionMenu4OptionMenuListener());
-			uifcInputPanel.InputPanelFind(OTK_DIALOG, "InputPanel3").AddActionListener(new InputPanel3Listener());
-			
+			uifcOptionMenu.OptionMenuFind(OTK_DIALOG, "OptionMenu3").AddActionListener(new OptionMenu3OptionMenuListener());	
 			uifcInputPanel.InputPanelFind(DialogMain.OTK_DIALOG, "InputPanel1").SetTextValue(dtf.format(now));
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
