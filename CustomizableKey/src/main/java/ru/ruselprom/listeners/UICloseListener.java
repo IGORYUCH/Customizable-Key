@@ -9,6 +9,6 @@ public class UICloseListener extends DefaultPushButtonListener {
 	
 	@Override
 	public void OnActivate(PushButton handle) throws jxthrowable{
-		uifcComponent.ExitDialog(handle.GetDialog(),0);
+		uifcComponent.ExitDialog(handle.GetDialog(), 0);
 	}
 }
