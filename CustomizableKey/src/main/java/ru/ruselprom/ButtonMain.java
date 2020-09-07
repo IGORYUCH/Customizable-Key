@@ -16,12 +16,12 @@ public class ButtonMain {
 	
 	public static void start() throws jxthrowable{ 
 		try {
-			KeyActionListener l  = new KeyActionListener();
-			l.OnCommand();
-		//Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
-		//UICommand uiCommand = session.UICreateCommand("Key", new KeyActionListener());
-		//uiCommand.SetIcon("key_icon16x16.png");
-		//uiCommand.Designate(MSG_FILE, "Key.label", "Help.text", null);
+		//	KeyActionListener l  = new KeyActionListener();
+		//	l.OnCommand();
+			Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
+			UICommand uiCommand = session.UICreateCommand("Key", new KeyActionListener());
+			uiCommand.SetIcon("key_icon16x16.png");
+			uiCommand.Designate(MSG_FILE, "Key.label", "Help.text", null);
 		
 		} catch (Exception e) {
 			showException(e);
