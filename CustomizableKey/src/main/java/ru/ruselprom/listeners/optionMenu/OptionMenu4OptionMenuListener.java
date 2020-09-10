@@ -24,8 +24,6 @@ public class OptionMenu4OptionMenuListener extends DefaultOptionMenuListener {
 	@Override
 	public void OnItemSelect(OptionMenu handle) throws jxthrowable {
 		if (uifcLayout.LayoutFind(DialogMain.OTK_DIALOG, "Layout4").IsVisible()) {
-			Session session = pfcSession.GetCurrentSessionWithCompatibility(CreoCompatibility.C4Compatible);
-			
 			stringseq selectedItemName = handle.GetSelectedItemNameArray();
 			OptionMenuItem selectedItem = uifcOptionMenu.OptionMenuItemFind(DialogMain.OTK_DIALOG, "OptionMenu4", selectedItemName.get(0));
 			
